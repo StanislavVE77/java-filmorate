@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     public Film update(@Validated(Update.class) @RequestBody Film film) {
         Film newFilm = repo.update(film);
         return newFilm;

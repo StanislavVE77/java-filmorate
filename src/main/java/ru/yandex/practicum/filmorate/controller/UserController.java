@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     public User update(@Validated(Update.class) @RequestBody User user) {
         User newUser = repo.update(user);
         return newUser;
