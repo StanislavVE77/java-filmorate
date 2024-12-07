@@ -20,6 +20,9 @@ public class UserRepository {
     public void create(User user) {
         log.info("Create user: {} - started.", user);
         user.setId(getNextId());
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         users.put(user.getId(), user);
         log.info("Create user: {} - finished.", user);
     }

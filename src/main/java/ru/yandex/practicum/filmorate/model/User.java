@@ -24,7 +24,7 @@ public class User {
     @Pattern(regexp = "^[a-zA-Z0-9-_.]{3,}$", groups = {Create.class, Update.class})
     private String login;
 
-    @NotNull(groups = {Create.class, Update.class})
+
     private String name;
 
     @Past(groups = {Create.class, Update.class})
