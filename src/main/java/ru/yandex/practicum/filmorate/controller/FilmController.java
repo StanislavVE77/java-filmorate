@@ -16,7 +16,7 @@ import java.util.Collection;
 @Slf4j
 @Validated
 public class FilmController {
-    FilmRepository repo = new FilmRepository();
+    private final FilmRepository repo = new FilmRepository();
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -26,15 +26,19 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@Validated(Create.class) @RequestBody final Film film) {
-        repo.create(film);
-        return film;
+    public Film create(@Validated(Create.class) @RequestBody Film film) {
+        log.info("Пришел Post запрос /films с телом: {}", film);
+        Film respFilm = repo.create(film);
+        log.info("Отправлен ответ Post /films с телом: {}", respFilm);
+        return respFilm;
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Film update(@Validated(Update.class) @RequestBody Film film) {
-        Film newFilm = repo.update(film);
-        return newFilm;
+        log.info("Пришел Put запрос /films с телом: {}", film);
+        Film respFilm = repo.update(film);
+        log.info("Отправлен ответ Put /films с телом: {}", respFilm);
+        return respFilm;
     }
 }

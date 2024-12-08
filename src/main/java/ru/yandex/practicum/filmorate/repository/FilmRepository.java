@@ -11,20 +11,19 @@ import java.util.Map;
 @Slf4j
 public class FilmRepository {
     private final Map<Long, Film> films = new HashMap<>();
+    protected long seq = 0L;
 
     public Collection<Film> get() {
         return films.values();
     }
 
-    public void create(Film film) {
-        log.info("Create film: {} - started.", film);
-        film.setId(getNextId());
+    public Film create(Film film) {
+        film.setId(generateId());
         films.put(film.getId(), film);
-        log.info("Create film: {} - finished.", film);
+        return film;
     }
 
     public Film update(Film newFilm) {
-        log.info("Update film: {} - started.", newFilm);
         if (films.containsKey(newFilm.getId())) {
             Film oldFilm = films.get(newFilm.getId());
             if (newFilm.getName() != null) {
@@ -37,20 +36,13 @@ public class FilmRepository {
             if (newFilm.getDuration() != null) {
                 oldFilm.setDuration(newFilm.getDuration());
             }
-            log.info("Update film: {} - finished.", newFilm);
             return oldFilm;
         }
         log.error("Film id: {} - not found.", newFilm.getId());
         throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    private long generateId() {
+        return ++seq;
     }
-
 }

@@ -10,25 +10,23 @@ import java.util.Map;
 
 @Slf4j
 public class UserRepository {
-
     private final Map<Long, User> users = new HashMap<>();
+    protected long seq = 0L;
 
     public Collection<User> get() {
         return users.values();
     }
 
-    public void create(User user) {
-        log.info("Create user: {} - started.", user);
-        user.setId(getNextId());
+    public User create(User user) {
+        user.setId(generateId());
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         users.put(user.getId(), user);
-        log.info("Create user: {} - finished.", user);
+        return user;
     }
 
     public User update(User newUser) {
-        log.info("Update user: {} - started.", newUser);
         if (users.containsKey(newUser.getId())) {
             User oldUser = users.get(newUser.getId());
             if (newUser.getName() == null || newUser.getName().isEmpty()) {
@@ -47,20 +45,14 @@ public class UserRepository {
             if (newUser.getBirthday() != null) {
                 oldUser.setBirthday(newUser.getBirthday());
             }
-            log.info("Update user: {} - finished.", newUser);
             return oldUser;
         }
         log.error("User id: {} - not found.", newUser.getId());
         throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    private long generateId() {
+        return ++seq;
     }
 
 }
