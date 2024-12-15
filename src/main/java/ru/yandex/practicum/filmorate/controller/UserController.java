@@ -20,6 +20,7 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
+        log.info("Отправлен ответ Get /users с телом: {}", repo.get());
         return repo.get();
     }
 

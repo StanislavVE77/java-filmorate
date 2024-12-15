@@ -21,10 +21,11 @@ public class FilmController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findAll() {
+        log.info("Отправлен ответ Get /films с телом: {}", repo.get());
         return repo.get();
     }
 
-    @PostMapping
+        @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film create(@Validated(Create.class) @RequestBody Film film) {
         log.info("Пришел Post запрос /films с телом: {}", film);
