@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * User.
@@ -29,4 +30,6 @@ public class User {
 
     @Past(groups = {Create.class, Update.class})
     private LocalDate birthday;
+
+    private Set<Long> friends;
 }
