@@ -37,6 +37,8 @@ public class FilmService extends InMemoryFilmStorage {
     public Film deleteLikeFromFilm(long id, long userId) {
         final Film film = findFilmById(id)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден."));
+        final User user = userService.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден."));
         Set<Long> filmLikes = film.getLikes();
         if (filmLikes != null) {
             filmLikes.remove(userId);
@@ -54,6 +56,11 @@ public class FilmService extends InMemoryFilmStorage {
     }
 
     private Integer getLikesCount(Film film) {
-        return film.getLikes().size();
+        Set<Long> filmLikes = film.getLikes();
+        if (filmLikes == null) {
+            return 0;
+        } else {
+            return film.getLikes().size();
+        }
     }
 }

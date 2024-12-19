@@ -7,9 +7,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import javax.validation.ValidationException;
+
 import java.util.Collection;
 
 @RestController

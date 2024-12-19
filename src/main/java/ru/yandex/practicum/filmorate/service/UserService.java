@@ -44,7 +44,7 @@ public class UserService  extends InMemoryUserStorage {
         final User user = findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
         final User friendUser = findUserById(friendId)
-                .orElseThrow(() -> new NotFoundException("Добавляемый в друзья пользователь с id = " + friendId + " не найден."));
+                .orElseThrow(() -> new NotFoundException("Удаляемый из друзей пользователь с id = " + friendId + " не найден."));
         Set<Long> curOtherFriends = friendUser.getFriends();
         if (curOtherFriends != null) {
             curOtherFriends.remove(id);
