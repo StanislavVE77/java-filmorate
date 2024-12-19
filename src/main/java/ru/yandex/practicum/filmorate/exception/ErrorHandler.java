@@ -13,15 +13,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        return new ErrorResponse("Ошибка с входным параметром.", e.getMessage()
-        );
+        return new ErrorResponse("Ошибка с входным параметром.", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
-        return new ErrorResponse("Ошибка с входным параметром.", e.getMessage()
-        );
+        return new ErrorResponse("Ошибка с входным параметром.", e.getMessage());
     }
 
     @ExceptionHandler
