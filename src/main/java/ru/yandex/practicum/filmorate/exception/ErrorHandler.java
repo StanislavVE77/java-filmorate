@@ -26,7 +26,8 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return new ErrorResponse("Ошибка ограничения полей.", e.getMessage());    }
+        return new ErrorResponse("Ошибка ограничения полей.", e.getMessage());
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
