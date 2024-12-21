@@ -67,4 +67,22 @@ public class UserService {
         }
         return commonFriends;
     }
+
+    public User get(long userId) {
+        User user = inMemoryUserStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+        return user;
+    }
+
+    public User create(User user) {
+        return inMemoryUserStorage.create(user);
+    }
+
+    public User update(User user) {
+        return inMemoryUserStorage.update(user);
+    }
+
+    public Collection<User> getUsers() {
+        return inMemoryUserStorage.getAll();
+    }
 }

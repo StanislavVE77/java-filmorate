@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
 
@@ -17,20 +16,14 @@ import java.util.Collection;
 @RequestMapping("/users")
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final InMemoryUserStorage inMemoryUserStorage;
-
-    @Autowired
-    public UserController(UserService userService, InMemoryUserStorage inMemoryUserStorage) {
-        this.userService = userService;
-        this.inMemoryUserStorage = inMemoryUserStorage;
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<User> findAll() {
-        Collection<User> allUsers = inMemoryUserStorage.getAll();
+        Collection<User> allUsers = userService.getUsers();
         log.info("Отправлен ответ Get /users с телом: {}", allUsers);
         return allUsers;
     }
@@ -39,7 +32,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@Validated(Create.class) @RequestBody final User user) {
         log.info("Пришел Post запрос /users с телом: {}", user);
-        User curUser = inMemoryUserStorage.create(user);
+        User curUser = userService.create(user);
         log.info("Отправлен ответ Post /users с телом: {}", curUser);
         return curUser;
     }
@@ -48,7 +41,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User update(@Validated(Update.class) @RequestBody final User user) {
         log.info("Пришел Put запрос /users с телом: {}", user);
-        User curUser = inMemoryUserStorage.update(user);
+        User curUser = userService.update(user);
         log.info("Отправлен ответ Put /users с телом: {}", curUser);
         return curUser;
     }
@@ -56,7 +49,7 @@ public class UserController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable("id") long id) {
-        User curUser = inMemoryUserStorage.findUserById(id).get();
+        User curUser = userService.get(id);
         log.info("Отправлен ответ Get /users/{} с телом: {}", id, curUser);
         return curUser;
     }

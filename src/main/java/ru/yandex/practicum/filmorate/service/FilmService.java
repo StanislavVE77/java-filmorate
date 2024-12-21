@@ -47,6 +47,24 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
+    public Film get(long filmId) {
+        Film film = inMemoryFilmStorage.findFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
+        return film;
+    }
+
+    public Film create(Film film) {
+        return inMemoryFilmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        return inMemoryFilmStorage.update(film);
+    }
+
+    public Collection<Film> getFilms() {
+        return inMemoryFilmStorage.getAll();
+    }
+
     private Integer getLikesCount(Film film) {
         return film.getLikes().size();
     }

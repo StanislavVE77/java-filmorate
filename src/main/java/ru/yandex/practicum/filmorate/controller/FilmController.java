@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.util.Collection;
 
@@ -18,20 +17,14 @@ import java.util.Collection;
 @RequestMapping("/films")
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class FilmController {
     private final FilmService filmService;
-    private final InMemoryFilmStorage inMemoryFilmStorage;
-
-    @Autowired
-    public FilmController(FilmService filmService, InMemoryFilmStorage inMemoryFilmStorage) {
-        this.filmService = filmService;
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findAll() {
-        Collection<Film> allFilms = inMemoryFilmStorage.getAll();
+        Collection<Film> allFilms = filmService.getFilms();
         log.info("Отправлен ответ Get /films с телом: {}", allFilms);
         return allFilms;
     }
@@ -40,7 +33,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     public Film create(@Validated(Create.class) @RequestBody final Film film) {
         log.info("Пришел Post запрос /films с телом: {}", film);
-        Film curFilm = inMemoryFilmStorage.create(film);
+        Film curFilm = filmService.create(film);
         log.info("Отправлен ответ Post /films с телом: {}", curFilm);
         return curFilm;
     }
@@ -49,7 +42,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public Film update(@Validated(Update.class) @RequestBody final Film film) {
         log.info("Пришел Put запрос /films с телом: {}", film);
-        Film curFilm = inMemoryFilmStorage.update(film);
+        Film curFilm = filmService.update(film);
         log.info("Отправлен ответ Put /films с телом: {}", curFilm);
         return curFilm;
     }
@@ -57,7 +50,7 @@ public class FilmController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film getFilm(@PathVariable("id") long id) {
-        Film curFilm = inMemoryFilmStorage.findFilmById(id).get();
+        Film curFilm = filmService.get(id);
         log.info("Отправлен ответ Get /films/{} с телом: {}", id, curFilm);
         return curFilm;
     }
