@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -32,4 +34,15 @@ public class Film {
 
     @Positive(groups = {Create.class, Update.class})
     private Integer duration;
+
+    private final Set<Long> likes = new HashSet<>();
+
+    public void addLike(long id) {
+        likes.add(id);
+    }
+
+    public void removeLike(long id) {
+        likes.remove(id);
+    }
+
 }
