@@ -11,88 +11,60 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class UserService  extends InMemoryUserStorage {
+public class UserService {
+    private final InMemoryUserStorage inMemoryUserStorage;
 
-    public User addFriendToUser(long id, long friendId) {
+    public UserService(InMemoryUserStorage inMemoryUserStorage) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+    }
+
+    public void addFriendToUser(long id, long friendId) {
         if (id == friendId) {
             throw new ValidationException("Нельзя добавить в друзья самого себя.");
         }
-        final User user = findUserById(id)
+        final User user = inMemoryUserStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User friendUser = findUserById(friendId)
+        final User friendUser = inMemoryUserStorage.findUserById(friendId)
                 .orElseThrow(() -> new NotFoundException("Добавляемый в друзья пользователь с id = " + friendId + " не найден."));
-        Set<Long> curOtherFriends = friendUser.getFriends();
-        if (curOtherFriends == null) {
-            curOtherFriends = new HashSet<>();
-        }
-            curOtherFriends.add(id);
-        friendUser.setFriends(curOtherFriends);
-
-        Set<Long> curFriends = user.getFriends();
-        if (curFriends == null) {
-            curFriends = new HashSet<>();
-        }
-        curFriends.add(friendId);
-        user.setFriends(curFriends);
-        return user;
+        user.addUser(friendId);
+        friendUser.addUser(id);
     }
 
-    public User deleteFriendFromUser(long id, long friendId) {
+    public void deleteFriendFromUser(long id, long friendId) {
         if (id == friendId) {
             throw new ValidationException("Идентификаторы пользователя и друга совпадают.");
         }
-        final User user = findUserById(id)
+        final User user = inMemoryUserStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User friendUser = findUserById(friendId)
+        final User friendUser = inMemoryUserStorage.findUserById(friendId)
                 .orElseThrow(() -> new NotFoundException("Удаляемый из друзей пользователь с id = " + friendId + " не найден."));
-        Set<Long> curOtherFriends = friendUser.getFriends();
-        if (curOtherFriends != null) {
-            curOtherFriends.remove(id);
-            friendUser.setFriends(curOtherFriends);
-        }
-        Set<Long> curFriends = user.getFriends();
-        if (curFriends != null) {
-            curFriends.remove(friendId);
-            user.setFriends(curFriends);
-        }
-        return user;
+        user.removeUser(friendId);
+        friendUser.removeUser(id);
     }
 
     public Collection<User> getUserFriends(long id) {
         Collection<User> userFriends = new HashSet<>();
-        final User user = findUserById(id)
+        final User user = inMemoryUserStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
         Set<Long> curFriends = user.getFriends();
-        if (curFriends != null) {
-            for (Long tempId : curFriends) {
-                userFriends.add(findUserById(tempId).get());
-            }
+        for (Long tempId : curFriends) {
+            userFriends.add(inMemoryUserStorage.findUserById(tempId).get());
         }
         return userFriends;
     }
 
     public Collection<User> getUsersCommonFriends(long id, long otherId) {
         Collection<User> commonFriends = new HashSet<>();
-        final User user = findUserById(id)
+        final User user = inMemoryUserStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User otherUser = findUserById(otherId)
+        final User otherUser = inMemoryUserStorage.findUserById(otherId)
                 .orElseThrow(() -> new NotFoundException("Добавляемый в друзья пользователь с id = " + otherId + " не найден."));
         Set<Long> friends = user.getFriends();
-        if (friends == null) {
-            friends = new HashSet<>();
-        }
         Set<Long> otherFriends = otherUser.getFriends();
-        if (otherFriends == null) {
-            otherFriends = new HashSet<>();
-        }
-        for (Long oneId : friends) {
-            for (Long twoId : otherFriends) {
-                if (oneId == twoId) {
-                    commonFriends.add(findUserById(oneId).get());
-                }
-            }
+        friends.retainAll(otherFriends);
+        for (Long commonId : friends) {
+            commonFriends.add(inMemoryUserStorage.findUserById(commonId).get());
         }
         return commonFriends;
     }
-
 }

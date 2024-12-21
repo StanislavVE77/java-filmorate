@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,11 +30,16 @@ public class ErrorHandler {
         return new ErrorResponse("Ошибка ограничения полей.", e.getMessage());
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse onConstraintViolationException(ConstraintViolationException e) {
+        return new ErrorResponse("Ошибка ограничения полей.", e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final Exception e) {
         log.warn("Error", e);
         return new ErrorResponse("Произошла непредвиденная ошибка.", e.getMessage());
     }
-
 }

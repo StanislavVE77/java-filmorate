@@ -11,8 +11,6 @@ public interface UserStorage {
 
     User update(User user);
 
-    //long delete(User user);
-
     Collection<User> getAll();
 
     Optional<User> findUserById(long id);
