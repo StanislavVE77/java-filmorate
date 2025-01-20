@@ -28,11 +28,19 @@ public class UserController {
         return allUsers;
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public User getUser(@PathVariable("id") long id) {
+        User curUser = userService.getUserById(id);
+        log.info("Отправлен ответ Get /users/{} с телом: {}", id, curUser);
+        return curUser;
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Validated(Create.class) @RequestBody final User user) {
+    public User create(@Validated(Create.class)  @RequestBody final User user) {
         log.info("Пришел Post запрос /users с телом: {}", user);
-        User curUser = userService.create(user);
+        User curUser = userService.createUser(user);
         log.info("Отправлен ответ Post /users с телом: {}", curUser);
         return curUser;
     }
@@ -41,18 +49,21 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User update(@Validated(Update.class) @RequestBody final User user) {
         log.info("Пришел Put запрос /users с телом: {}", user);
-        User curUser = userService.update(user);
+        User curUser = userService.updateUser(user);
         log.info("Отправлен ответ Put /users с телом: {}", curUser);
         return curUser;
     }
 
-    @GetMapping("/{id}")
+/*
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User getUser(@PathVariable("id") long id) {
-        User curUser = userService.get(id);
-        log.info("Отправлен ответ Get /users/{} с телом: {}", id, curUser);
+    public User update(@Validated(Update.class) @PathVariable("id") long id, @RequestBody final User user) {
+        log.info("Пришел Put запрос /users с телом: {}", user);
+        User curUser = userService.updateUser(id, user);
+        log.info("Отправлен ответ Put /users с телом: {}", curUser);
         return curUser;
     }
+*/
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)

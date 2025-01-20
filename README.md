@@ -2,4 +2,4 @@
 Template repository for Filmorate project.
 
 ## Filmorate Database Scheme
-![Filmorate Database Scheme](./dbSchemeFilmorate.png)
+![Filmorate Database Scheme](./schema.png)

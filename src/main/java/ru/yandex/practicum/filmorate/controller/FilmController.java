@@ -28,30 +28,30 @@ public class FilmController {
         log.info("Отправлен ответ Get /films с телом: {}", allFilms);
         return allFilms;
     }
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film getUser(@PathVariable("id") long id) {
+        Film curFilm = filmService.getFilmById(id);
+        log.info("Отправлен ответ Get /films/{} с телом: {}", id, curFilm);
+        return curFilm;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film create(@Validated(Create.class) @RequestBody final Film film) {
         log.info("Пришел Post запрос /films с телом: {}", film);
-        Film curFilm = filmService.create(film);
+        Film curFilm = filmService.createFilm(film);
         log.info("Отправлен ответ Post /films с телом: {}", curFilm);
         return curFilm;
     }
+
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Film update(@Validated(Update.class) @RequestBody final Film film) {
         log.info("Пришел Put запрос /films с телом: {}", film);
-        Film curFilm = filmService.update(film);
+        Film curFilm = filmService.updateFilm(film);
         log.info("Отправлен ответ Put /films с телом: {}", curFilm);
-        return curFilm;
-    }
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Film getFilm(@PathVariable("id") long id) {
-        Film curFilm = filmService.get(id);
-        log.info("Отправлен ответ Get /films/{} с телом: {}", id, curFilm);
         return curFilm;
     }
 

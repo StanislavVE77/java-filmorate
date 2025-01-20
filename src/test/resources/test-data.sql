@@ -1,0 +1,1 @@
+INSERT INTO users (email, login, name, birthday) VALUES ('user@mail.ru', 'login', 'Name', '2000-03-22');
