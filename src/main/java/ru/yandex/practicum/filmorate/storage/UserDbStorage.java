@@ -30,8 +30,7 @@ public class UserDbStorage implements UserStorage {
     protected final RowMapper<User> mapper;
 
     @Override
-    public User create(User user)
-    {
+    public User create(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -48,8 +47,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user)
-    {
+    public User update(User user) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("login", user.getLogin());
         params.addValue("email", user.getEmail());
@@ -61,14 +59,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getAll()
-    {
+    public Collection<User> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
     @Override
-    public Optional<User> findUserById(long id)
-    {
+    public Optional<User> findUserById(long id) {
         try {
             SqlParameterSource params = new MapSqlParameterSource("id", id);
             User result = jdbc.queryForObject(FIND_BY_ID_QUERY, params, mapper);
@@ -78,8 +74,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public Optional<User> findUserByEmail(String email)
-    {
+    public Optional<User> findUserByEmail(String email) {
         try {
             SqlParameterSource params = new MapSqlParameterSource("email", email);
             User result = jdbc.queryForObject(FIND_BY_EMAIL_QUERY, params, mapper);
