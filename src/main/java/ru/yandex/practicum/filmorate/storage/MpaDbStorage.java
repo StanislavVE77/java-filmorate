@@ -30,8 +30,7 @@ public class MpaDbStorage {
         }
     }
 
-    public List<Mpa> getAll()
-    {
+    public List<Mpa> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 }
