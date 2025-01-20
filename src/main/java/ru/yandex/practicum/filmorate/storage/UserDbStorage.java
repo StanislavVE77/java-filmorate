@@ -84,17 +84,17 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public  void  addFriend(Long id, Long friend_id) {
+    public  void  addFriend(Long id, Long friendId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", id);
-        params.addValue("friend_id", friend_id);
+        params.addValue("friend_id", friendId);
         jdbc.update(INSERT_FRIEND_QUERY, params);
     }
 
-    public  void  deleteFriend(Long id, Long friend_id) {
+    public  void  deleteFriend(Long id, Long friendId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", id);
-        params.addValue("friend_id", friend_id);
+        params.addValue("friend_id", friendId);
         jdbc.update(DELETE_FRIEND_QUERY, params);
     }
 
