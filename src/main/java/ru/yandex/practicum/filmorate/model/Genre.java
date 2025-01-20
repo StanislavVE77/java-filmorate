@@ -18,5 +18,4 @@ public class Genre {
     private long id;
     @NotBlank(groups = {Create.class, Update.class})
     private String name;
-
 }

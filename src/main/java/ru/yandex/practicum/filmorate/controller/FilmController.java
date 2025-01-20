@@ -28,6 +28,7 @@ public class FilmController {
         log.info("Отправлен ответ Get /films с телом: {}", allFilms);
         return allFilms;
     }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film getUser(@PathVariable("id") long id) {
@@ -44,7 +45,6 @@ public class FilmController {
         log.info("Отправлен ответ Post /films с телом: {}", curFilm);
         return curFilm;
     }
-
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)

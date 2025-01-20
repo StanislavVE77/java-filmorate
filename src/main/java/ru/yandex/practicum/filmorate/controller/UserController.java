@@ -54,17 +54,6 @@ public class UserController {
         return curUser;
     }
 
-/*
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public User update(@Validated(Update.class) @PathVariable("id") long id, @RequestBody final User user) {
-        log.info("Пришел Put запрос /users с телом: {}", user);
-        User curUser = userService.updateUser(id, user);
-        log.info("Отправлен ответ Put /users с телом: {}", curUser);
-        return curUser;
-    }
-*/
-
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public void addFriend(@PathVariable("id") long id, @PathVariable("friendId") long friendId) {
