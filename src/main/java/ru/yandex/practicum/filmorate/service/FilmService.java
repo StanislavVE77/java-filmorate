@@ -68,10 +68,6 @@ public class FilmService {
         if (film.getName() == null || film.getName().isEmpty()) {
             throw new ValidationException("Название фильма должен быть указано");
         }
-        Optional<Film> alreadyExistFilm = filmDbStorage.findFilmByName(film.getName());
-        if (alreadyExistFilm.isPresent()) {
-            throw new ValidationException("Данный фильм уже есть");
-        }
         if (film.getMpa() != null) {
             int mpaId = film.getMpa().getId();
             Mpa mpa = mpaDbStorage.findMpaById(mpaId)
