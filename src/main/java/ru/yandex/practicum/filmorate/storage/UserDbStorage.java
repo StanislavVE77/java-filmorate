@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -11,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.ResultSet;
 import java.util.*;
 
 @Slf4j
@@ -27,7 +26,6 @@ public class UserDbStorage implements UserStorage {
     private static final String FIND_USER_FRIENDS_QUERY = "SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = :user_id)";
 
     private final NamedParameterJdbcOperations jdbc;
-    protected final RowMapper<User> mapper;
 
     @Override
     public User create(User user) {
@@ -60,38 +58,70 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> getAll() {
-        return jdbc.query(FIND_ALL_QUERY, mapper);
+        return jdbc.query(FIND_ALL_QUERY, (ResultSet rs) -> {
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                User user = new User();
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setName(rs.getString("name"));
+                user.setId(rs.getInt("id"));
+                user.setBirthday(rs.getDate("birthday").toLocalDate());
+                users.add(user);
+            }
+            return users;
+        });
     }
 
     @Override
     public Optional<User> findUserById(long id) {
-        try {
-            SqlParameterSource params = new MapSqlParameterSource("id", id);
-            User result = jdbc.queryForObject(FIND_BY_ID_QUERY, params, mapper);
+        SqlParameterSource params = new MapSqlParameterSource("id", id);
+        User result = jdbc.query(FIND_BY_ID_QUERY, params, (ResultSet rs) -> {
+            User user = new User();
+            while (rs.next()) {
+                user.setId(rs.getInt("id"));
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setName(rs.getString("name"));
+                user.setBirthday(rs.getDate("birthday").toLocalDate());
+            }
+            return user;
+        });
+        if (result.getId() != 0) {
             return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
+        } else {
             return Optional.empty();
         }
     }
 
     public Optional<User> findUserByEmail(String email) {
-        try {
-            SqlParameterSource params = new MapSqlParameterSource("email", email);
-            User result = jdbc.queryForObject(FIND_BY_EMAIL_QUERY, params, mapper);
+        SqlParameterSource params = new MapSqlParameterSource("email", email);
+        User result = jdbc.query(FIND_BY_EMAIL_QUERY, params, (ResultSet rs) -> {
+            User user = new User();
+            while (rs.next()) {
+                user.setId(rs.getInt("id"));
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setName(rs.getString("name"));
+                user.setBirthday(rs.getDate("birthday").toLocalDate());
+            }
+            return user;
+        });
+        if (result.getId() != 0) {
             return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
+        } else {
             return Optional.empty();
         }
     }
 
-    public  void  addFriend(Long id, Long friendId) {
+    public void addFriend(Long id, Long friendId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", id);
         params.addValue("friend_id", friendId);
         jdbc.update(INSERT_FRIEND_QUERY, params);
     }
 
-    public  void  deleteFriend(Long id, Long friendId) {
+    public void deleteFriend(Long id, Long friendId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", id);
         params.addValue("friend_id", friendId);
@@ -101,6 +131,18 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> getFriends(Long id) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", id);
-        return jdbc.query(FIND_USER_FRIENDS_QUERY, params, mapper);
+        return jdbc.query(FIND_USER_FRIENDS_QUERY, params, (ResultSet rs) -> {
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setName(rs.getString("name"));
+                user.setBirthday(rs.getDate("birthday").toLocalDate());
+                users.add(user);
+            }
+            return users;
+        });
     }
 }

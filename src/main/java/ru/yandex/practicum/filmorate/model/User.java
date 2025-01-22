@@ -37,5 +37,5 @@ public class User {
     @Past(groups = {Create.class, Update.class})
     private LocalDate birthday;
 
-    final Set<Long> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>();
 }

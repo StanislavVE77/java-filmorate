@@ -14,8 +14,6 @@ public interface FilmStorage {
 
     Optional<Film> findFilmById(long id);
 
-    Optional<Film> findFilmByName(String name);
-
     void addLike(Long filmId, Long userId);
 
     void deleteLike(Long filmId, Long userId);

@@ -11,9 +11,12 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,19 +26,10 @@ public class GenreDbStorage implements GenreStorage {
     private static final String DELETE_GENRE_FROM_FILM_QUERY = "DELETE FROM film_genre WHERE film_id = :film_id AND genre_id :genre_id)";
     private static final String FIND_ALL_QUERY = "SELECT * FROM genre";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM genre WHERE id = :id";
+    private static final String LOAD_ALL_QUERY = "SELECT * FROM genre g, film_genre fg WHERE fg.genre_id = g.id AND fg.film_id IN ( SELECT id FROM films )";
+    private static final String LOAD_ONE_QUERY = "SELECT * FROM genre g, film_genre fg WHERE fg.genre_id = g.id AND fg.film_id = :id";
     private final NamedParameterJdbcOperations jdbc;
     protected final RowMapper<Genre> mapper;
-
-    @Override
-    public List<Genre> findGenresByFilmId(Long id) {
-        try {
-            SqlParameterSource params = new MapSqlParameterSource("id", id);
-            List<Genre> result = jdbc.query(FIND_BY_FILMID_QUERY, params, mapper);
-            return result;
-        } catch (EmptyResultDataAccessException ignored) {
-            return List.of();
-        }
-    }
 
     @Override
     public List<Genre> getAll() {
@@ -82,14 +76,48 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public LinkedHashSet<Genre> findByIds(List<Long> ids) {
-        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
-        for (Long id : ids) {
-            List<Genre> genres = findGenresByFilmId(id);
-            for (Genre genre : genres) {
-                genreList.add(genre);
+    public void load(Film film) {
+        SqlParameterSource params = new MapSqlParameterSource("id", film.getId());
+        jdbc.query(LOAD_ONE_QUERY, params,
+            (rs) -> {
+                Genre genre = makeGenre(rs, 0);
+                film.addGenre(genre);
             }
-        }
-        return genreList;
+        );
     }
+
+    @Override
+    public void loadAll(List<Film> films) {
+        final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        jdbc.query(LOAD_ALL_QUERY,  (rs) -> {
+                final Film film = filmById.get(rs.getLong("film_id"));
+                Genre genre = makeGenre(rs, 0);
+                film.addGenre(genre);
+            }
+        );
+    }
+
+    static Genre makeGenre(ResultSet rs, int rowNum) throws SQLException {
+        return new Genre(
+                rs.getLong("genre_id"),
+                rs.getString("name"));
+    }
+/*
+    @Override
+    public void loadAll(List<Film> films) {
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+        final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        Object[] filmIds = films.stream().map(Film::getId).toArray();
+        final String sqlQuery = "select * from GENRE g, FILM_GENRE fg where fg.GENRE_ID = g.ID AND fg.FILM_ID in (" + inSql + ")";
+        jdbcTemplate.query(
+            sqlQuery,
+            (rs) -> {
+                     final Film film = filmById.get(rs.getLong("film_id"));
+                    film.addGenre(makeGenre(rs, 0));
+            },
+            filmIds
+        );
+    }
+*/
+
 }

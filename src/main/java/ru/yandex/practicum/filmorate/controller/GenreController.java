@@ -21,16 +21,18 @@ public class GenreController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Genre> getAll() {
+        log.info("Пришел GET запрос /genres ");
         List<Genre> allGenre = filmService.getAllGenre();
-        log.info("Отправлен ответ Get /genres с телом: {}", allGenre);
+        log.info("Отправлен ответ на GET /genres с телом: {}", allGenre);
         return allGenre;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Genre getGenre(@PathVariable("id") Long id) {
+        log.info("Пришел GET запрос /genres/{} ", id);
         Genre curGenre = filmService.getGenreById(id);
-        log.info("Отправлен ответ Get /genres/{} с телом: {}", id, curGenre);
+        log.info("Отправлен ответ на GET /genres/{} с телом: {}", id, curGenre);
         return curGenre;
     }
 }

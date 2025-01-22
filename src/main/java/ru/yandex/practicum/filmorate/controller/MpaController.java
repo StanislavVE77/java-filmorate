@@ -21,16 +21,18 @@ public class MpaController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Mpa> getAll() {
+        log.info("Пришел GET запрос /mpa ");
         List<Mpa> allMpa = filmService.getAllMpa();
-        log.info("Отправлен ответ Get /mpa с телом: {}", allMpa);
+        log.info("Отправлен ответ на GET /mpa с телом: {}", allMpa);
         return allMpa;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mpa getMpa(@PathVariable("id") int id) {
+        log.info("Пришел GET запрос /genres/{} ", id);
         Mpa curMpa = filmService.getMpaById(id);
-        log.info("Отправлен ответ Get /mpa/{} с телом: {}", id, curMpa);
+        log.info("Отправлен ответ на GET /mpa/{} с телом: {}", id, curMpa);
         return curMpa;
     }
 }

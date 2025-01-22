@@ -18,9 +18,8 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
-    private static final String FIND_ALL_QUERY = "SELECT * FROM films";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM films WHERE id = :id";
-    private static final String FIND_BY_NAME_QUERY = "SELECT * FROM films WHERE name = :name";
+    private static final String FIND_ALL_QUERY = "SELECT f.*, m.name AS mpa_name FROM films f, mpa m WHERE f.mpa_id = m.id";
+    private static final String FIND_BY_ID_QUERY = "SELECT f.*, m.name AS mpa_name FROM films f, mpa m WHERE f.id = :id AND f.mpa_id = m.id";
     private static final String INSERT_QUERY = "INSERT INTO films(name, description, duration, releaseDate) VALUES (:name, :description, :duration, :releaseDate)";
     private static final String INSERT_WITH_MPA_QUERY = "INSERT INTO films(name, description, duration, releaseDate, mpa_id) VALUES (:name, :description, :duration, :releaseDate, :mpa_id)";
     private static final String UPDATE_QUERY = "UPDATE films SET name = :name, description = :description, duration = :duration, releaseDate = :releaseDate, mpa_id = :mpa_id WHERE id = :id";
@@ -76,17 +75,6 @@ public class FilmDbStorage implements FilmStorage {
         try {
             SqlParameterSource params = new MapSqlParameterSource("id", id);
             Film result = jdbc.queryForObject(FIND_BY_ID_QUERY, params, mapper);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<Film> findFilmByName(String name) {
-        try {
-            SqlParameterSource params = new MapSqlParameterSource("name", name);
-            Film result = jdbc.queryForObject(FIND_BY_NAME_QUERY, params, mapper);
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();

@@ -31,9 +31,9 @@ public class Film {
     @Size(max = 200, groups = {Create.class, Update.class})
     private String description;
 
-    Mpa mpa;
+    private Mpa mpa;
 
-    LinkedHashSet<Genre> genres;
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 
     @NotNull(groups = {Create.class})
     @ReleaseDate(groups = {Create.class})
@@ -42,4 +42,7 @@ public class Film {
     @Positive(groups = {Create.class, Update.class})
     private Integer duration;
 
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
 }

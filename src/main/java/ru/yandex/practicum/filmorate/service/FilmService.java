@@ -31,35 +31,13 @@ public class FilmService {
         Film film = filmDbStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с идентификатором " + filmId + " не найден."));
 
-        Mpa mpa = mpaDbStorage.findMpaById(film.getMpa().getId())
-                .orElseThrow(() -> new ValidationException("Рейтинг с  идентификатором " + film.getMpa().getId() + " не найден"));
-
-        LinkedHashSet<Genre> genres = genreDbStorage.findByIds(List.of(filmId));
-
-        film.setMpa(mpa);
-        film.setGenres(genres);
-
+        genreDbStorage.load(film);
         return film;
     }
 
     public List<Film> getFilms() {
-        List<Film> films = new ArrayList<>();
-        Optional<Mpa> mpa;
-        LinkedHashSet<Genre> genres;
-        for (Film film : filmDbStorage.getAll()) {
-            mpa = mpaDbStorage.findMpaById(film.getMpa().getId());
-            if (mpa.isPresent()) {
-                film.setMpa(mpa.get());
-            }
-
-            genres = genreDbStorage.findByIds(List.of(film.getId()));
-            if (!genres.isEmpty()) {
-                film.setGenres(genres);
-            }
-
-            films.add(film);
-        }
-
+        List<Film> films = filmDbStorage.getAll();
+        genreDbStorage.loadAll(films);
         return films;
     }
 

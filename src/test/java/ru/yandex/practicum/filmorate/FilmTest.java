@@ -96,5 +96,4 @@ public class FilmTest {
         Set<ConstraintViolation<Film>> violations = validator.validate(film, Create.class);
         assertEquals(1, violations.size(), "Violations not found");
     }
-
 }
