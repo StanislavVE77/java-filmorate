@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
 
@@ -13,9 +12,16 @@ import java.util.Set;
 /**
  * User.
  */
-@Data
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Builder
+@EqualsAndHashCode(of = "id")
 public class User {
+
     @NotNull(groups = {Update.class})
     private long id;
     @Email(groups = {Create.class, Update.class})
@@ -31,14 +37,5 @@ public class User {
     @Past(groups = {Create.class, Update.class})
     private LocalDate birthday;
 
-    private final Set<Long> friends = new HashSet<>();
-
-    public void addUser(long id) {
-        friends.add(id);
-    }
-
-    public void removeUser(long id) {
-        friends.remove(id);
-    }
-
+    private Set<Long> friends = new HashSet<>();
 }

@@ -1,24 +1,27 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import lombok.*;
 import ru.yandex.practicum.filmorate.Create;
 import ru.yandex.practicum.filmorate.Update;
 import ru.yandex.practicum.filmorate.validator.ReleaseDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  * Film.
  */
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Builder
+@EqualsAndHashCode(of = "id")
 public class Film {
 
     @NotNull(groups = {Update.class})
@@ -28,6 +31,10 @@ public class Film {
     @Size(max = 200, groups = {Create.class, Update.class})
     private String description;
 
+    private Mpa mpa;
+
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+
     @NotNull(groups = {Create.class})
     @ReleaseDate(groups = {Create.class})
     private LocalDate releaseDate;
@@ -35,14 +42,7 @@ public class Film {
     @Positive(groups = {Create.class, Update.class})
     private Integer duration;
 
-    private final Set<Long> likes = new HashSet<>();
-
-    public void addLike(long id) {
-        likes.add(id);
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
-
-    public void removeLike(long id) {
-        likes.remove(id);
-    }
-
 }

@@ -2,87 +2,91 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import javax.validation.ValidationException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final UserDbStorage userDbStorage;
 
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserService(UserDbStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
+    }
+
+    public User getUserById(long userId) {
+        return userDbStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
+    }
+
+    public List<User> getUsers() {
+        return userDbStorage.getAll()
+                .stream()
+                .collect(Collectors.toList());
+    }
+
+    public User createUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new javax.validation.ValidationException("Имейл должен быть указан");
+        }
+        if (user.getLogin() == null || user.getLogin().isEmpty()) {
+            throw new javax.validation.ValidationException("Логин должен быть указан");
+        }
+        Optional<User> alreadyExistUser = userDbStorage.findUserByEmail(user.getEmail());
+        if (alreadyExistUser.isPresent()) {
+            throw new ValidationException("Данный имейл уже используется");
+        }
+        user = userDbStorage.create(user);
+        return user;
+    }
+
+    public User updateUser(User user) {
+        User updatedUser = userDbStorage.findUserById(user.getId())
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        updatedUser = userDbStorage.update(user);
+        return updatedUser;
     }
 
     public void addFriendToUser(long id, long friendId) {
         if (id == friendId) {
             throw new ValidationException("Нельзя добавить в друзья самого себя.");
         }
-        final User user = inMemoryUserStorage.findUserById(id)
+        final User user = userDbStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User friendUser = inMemoryUserStorage.findUserById(friendId)
+        final User friendUser = userDbStorage.findUserById(friendId)
                 .orElseThrow(() -> new NotFoundException("Добавляемый в друзья пользователь с id = " + friendId + " не найден."));
-        user.addUser(friendId);
-        friendUser.addUser(id);
+        userDbStorage.addFriend(id, friendId);
     }
 
     public void deleteFriendFromUser(long id, long friendId) {
         if (id == friendId) {
             throw new ValidationException("Идентификаторы пользователя и друга совпадают.");
         }
-        final User user = inMemoryUserStorage.findUserById(id)
+        final User user = userDbStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User friendUser = inMemoryUserStorage.findUserById(friendId)
+        final User friendUser = userDbStorage.findUserById(friendId)
                 .orElseThrow(() -> new NotFoundException("Удаляемый из друзей пользователь с id = " + friendId + " не найден."));
-        user.removeUser(friendId);
-        friendUser.removeUser(id);
+        userDbStorage.deleteFriend(id, friendId);
     }
 
     public Collection<User> getUserFriends(long id) {
-        Collection<User> userFriends = new HashSet<>();
-        final User user = inMemoryUserStorage.findUserById(id)
+        final User user = userDbStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        Set<Long> curFriends = user.getFriends();
-        for (Long tempId : curFriends) {
-            userFriends.add(inMemoryUserStorage.findUserById(tempId).get());
-        }
+        Collection<User> userFriends = userDbStorage.getFriends(id);
         return userFriends;
     }
 
     public Collection<User> getUsersCommonFriends(long id, long otherId) {
-        Collection<User> commonFriends = new HashSet<>();
-        final User user = inMemoryUserStorage.findUserById(id)
+        final User user = userDbStorage.findUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-        final User otherUser = inMemoryUserStorage.findUserById(otherId)
+        final User otherUser = userDbStorage.findUserById(otherId)
                 .orElseThrow(() -> new NotFoundException("Добавляемый в друзья пользователь с id = " + otherId + " не найден."));
-        Set<Long> friends = user.getFriends();
-        Set<Long> otherFriends = otherUser.getFriends();
-        friends.retainAll(otherFriends);
-        for (Long commonId : friends) {
-            commonFriends.add(inMemoryUserStorage.findUserById(commonId).get());
-        }
-        return commonFriends;
-    }
-
-    public User get(long userId) {
-        User user = inMemoryUserStorage.findUserById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        return user;
-    }
-
-    public User create(User user) {
-        return inMemoryUserStorage.create(user);
-    }
-
-    public User update(User user) {
-        return inMemoryUserStorage.update(user);
-    }
-
-    public Collection<User> getUsers() {
-        return inMemoryUserStorage.getAll();
+        Collection<User> userFriends = userDbStorage.getFriends(id);
+        Collection<User> otherUserFriends = userDbStorage.getFriends(otherId);
+        userFriends.retainAll(otherUserFriends);
+        return userFriends;
     }
 }
